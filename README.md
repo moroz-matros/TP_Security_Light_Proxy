@@ -1,6 +1,6 @@
 # TP_Security_Light_Proxy
 
-Light HTTP-Proxy. 
+Light HTTP-Proxy. Proxy HTTP requests
 
 start server with 
 
