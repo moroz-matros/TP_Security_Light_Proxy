@@ -20,6 +20,8 @@ sudo update-ca-certificates
 
 don't forget to add the cert to your browser. In Chrome:
 Settings ->
+
+some other commands
 sudo dpkg-reconfigure ca-certificates
 sudo cp gen_cert/ca.crt /usr/share/ca-certificates/
 
