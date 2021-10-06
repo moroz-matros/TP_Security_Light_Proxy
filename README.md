@@ -2,6 +2,27 @@
 
 Light HTTP-Proxy. Proxy HTTP requests
 
+HTTPS part:
+gen new cert with 
+```
+cd gen_cert
+./gen_ca.sh
+```
+return to parent folder with
+```
+cd ..
+```
+add cert to your system with
+```
+sudo cp gen_cert/ca.crt /usr/local/share/ca-certificates/
+sudo update-ca-certificates
+```
+
+don't forget to add the cert to your browser. In Chrome:
+Settings ->
+sudo dpkg-reconfigure ca-certificates
+sudo cp gen_cert/ca.crt /usr/share/ca-certificates/
+
 start server with 
 
 ```
@@ -11,6 +32,7 @@ go run main.go
 try work with 
 ```
 curl -x http://127.0.0.1:8080 http://mail.ru
+
 ```
 
 to build in Docker
@@ -18,4 +40,6 @@ to build in Docker
  sudo docker build -t proxy .
  sudo docker run -p 8080:8080 -d --name=proxy_container proxy
 ```
+
+
 

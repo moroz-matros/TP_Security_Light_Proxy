@@ -1,17 +1,24 @@
 package main
 
 import (
+	"crypto/tls"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"time"
 )
 
 const (
 	port      = ":8080"
+	pemFile = "gen_cert/ca.crt"
+	keyFile = "gen_cert/ca.key"
 )
+
 
 type Server struct {
 	Srv  http.Server
+	TLSNextProto map[string]func(*http.Server, *tls.Conn, http.Handler)
 }
 
 func newServer(port string) *Server {
@@ -19,11 +26,42 @@ func newServer(port string) *Server {
 		Srv: http.Server{
 			Addr: port,
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-				handleHTTP(w, r)
+				if r.Method == http.MethodConnect {
+					handleHTTPS(w, r)
+				} else {
+					handleHTTP(w, r)
+				}
 			}),
 		},
-
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}
+}
+
+func handleHTTPS(w http.ResponseWriter, r *http.Request) {
+	log.Println("received")
+	dest_conn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	hijacker, ok := w.(http.Hijacker)
+	if !ok {
+		http.Error(w, "Hijacking not supported", http.StatusInternalServerError)
+		return
+	}
+	client_conn, _, err := hijacker.Hijack()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+	}
+	go transfer(dest_conn, client_conn)
+	go transfer(client_conn, dest_conn)
+
+}
+func transfer(destination io.WriteCloser, source io.ReadCloser) {
+	defer destination.Close()
+	defer source.Close()
+	io.Copy(destination, source)
 }
 
 func handleHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +94,6 @@ func copyHeader(dst, src http.Header) {
 
 func main() {
 	server := newServer(port)
-	log.Fatal(server.Srv.ListenAndServe())
+	log.Fatal(server.Srv.ListenAndServeTLS(pemFile, keyFile))
 }
 
