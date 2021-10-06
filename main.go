@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time"
 )
 
 const (
@@ -27,6 +26,7 @@ func newServer(port string) *Server {
 			Addr: port,
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 				if r.Method == http.MethodConnect {
+					log.Println(1)
 					handleHTTPS(w, r)
 				} else {
 					handleHTTP(w, r)
@@ -38,13 +38,14 @@ func newServer(port string) *Server {
 }
 
 func handleHTTPS(w http.ResponseWriter, r *http.Request) {
-	log.Println("received")
-	dest_conn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
+	log.Println("connect")
+	dest_conn, err := net.Dial("tcp", r.Host)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+
 	hijacker, ok := w.(http.Hijacker)
 	if !ok {
 		http.Error(w, "Hijacking not supported", http.StatusInternalServerError)
@@ -94,6 +95,6 @@ func copyHeader(dst, src http.Header) {
 
 func main() {
 	server := newServer(port)
-	log.Fatal(server.Srv.ListenAndServeTLS(pemFile, keyFile))
+	log.Fatal(server.Srv.ListenAndServe())
 }
 
