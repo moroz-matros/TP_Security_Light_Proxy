@@ -12,7 +12,7 @@ return to parent folder with
 ```
 cd ..
 ```
-add cert to your system with
+add cert to your system (Ubuntu) with
 ```
 sudo cp gen_cert/ca.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
