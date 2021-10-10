@@ -1,6 +1,6 @@
 # TP_Security_Light_Proxy
 
-Light HTTP-Proxy. Proxy HTTP requests
+Light HTTP-Proxy. Proxy HTTP and HTTPS requests
 
 HTTPS part:
 gen new cert with 
@@ -18,12 +18,9 @@ sudo cp gen_cert/ca.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 ```
 
-don't forget to add the cert to your browser. In Chrome:
-Settings ->
-
-some other commands
-sudo dpkg-reconfigure ca-certificates
-sudo cp gen_cert/ca.crt /usr/share/ca-certificates/
+If you want to use with a browser, don't forget to add the cert to your browser. In Chrome:
+```Settings -> Privacy and security -> Security -> Manage certificates -> Authorities -> Import```
+Choose the generated file.
 
 start server with 
 
@@ -31,17 +28,11 @@ start server with
 go run main.go
 ```
 
-try work with 
+try work http with 
 ```
 curl -x http://127.0.0.1:8080 http://mail.ru
-
 ```
-
-to build in Docker
-```
- sudo docker build -t proxy .
- sudo docker run -p 8080:8080 -d --name=proxy_container proxy
-```
+You can launch Chrome and start working in it.
 
 
 

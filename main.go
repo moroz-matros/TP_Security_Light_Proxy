@@ -25,7 +25,6 @@ const (
 
 type Server struct {
 	Srv  http.Server
-	TLSNextProto map[string]func(*http.Server, *tls.Conn, http.Handler)
 }
 
 func newServer(port string) *Server {
@@ -40,13 +39,11 @@ func newServer(port string) *Server {
 				}
 			}),
 		},
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}
 }
 func getCert(host string) (tls.Certificate, error){
 	_, err := os.Stat(certDir + host + ".crt")
 	if os.IsNotExist(err) {
-		log.Println("start generating cert")
 		genCommand := exec.Command("gen_cert/gen_cert.sh", host, strconv.Itoa(rand.Intn(1000000)))
 
 		_, err = genCommand.CombinedOutput()
@@ -138,25 +135,25 @@ func handleHTTPS(w http.ResponseWriter, r *http.Request) {
 	//serve request
 	dumpRequest, err := httputil.DumpRequest(request, true)
 	if err != nil {
-		log.Println("fail to dump request", err)
+		log.Println("failed to dump request", err)
 		return
 	}
 	_, err = tcpServer.Write(dumpRequest)
 	if err != nil {
-		log.Println("fail to write request: ", err)
+		log.Println("failed to write request", err)
 		return
 	}
 
 	serverReader := bufio.NewReader(tcpServer)
 	response, err := http.ReadResponse(serverReader, request)
 	if err != nil {
-		log.Println("fail to read response: ", err)
+		log.Println("failed to read response", err)
 		return
 	}
 
 	rawResponse, err := httputil.DumpResponse(response, true)
 	if err != nil {
-		log.Println("fail to dump response: ", err)
+		log.Println("failed to dump response", err)
 		return
 	}
 
