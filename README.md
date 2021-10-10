@@ -20,7 +20,7 @@ sudo update-ca-certificates
 
 If you want to use with a browser, don't forget to add the cert to your browser. In Chrome:
 ```Settings -> Privacy and security -> Security -> Manage certificates -> Authorities -> Import```
-Choose the generated file.
+Choose the generated file. Check all flags.
 
 start server with 
 
@@ -32,6 +32,7 @@ try work http with
 ```
 curl -x http://127.0.0.1:8080 http://mail.ru
 ```
+Turn on proxy on your system with HTTP, HTTPS proxy host 127.0.0.1 port 8080.
 You can launch Chrome and start working in it.
 
 
