@@ -6,8 +6,9 @@
 *.dylib
 *.key
 *.pem
+*.crt
 .idea
-
+*certs
 # Test binary, built with `go test -c`
 *.test
 
